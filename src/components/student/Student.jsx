@@ -69,7 +69,7 @@ const Student = () => {
     const newStudent =
       e.target.value === "All"
         ? student
-        : student.filter((cn) => cn.category === e.target.value);
+        : student.filter((st) => st.group === e.target.value);
     setStudentToSend(newStudent);
   };
 
@@ -85,7 +85,7 @@ const Student = () => {
 
   useEffect(() => {
     searchStudent(search);
-  }, [search]);
+  }, [search, student]);
 
   return (
     <div className="container py-3 d-flex align-items-start justify-content-between">
