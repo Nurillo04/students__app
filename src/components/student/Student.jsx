@@ -4,11 +4,17 @@ import "./Students.scss";
 
 import StudentForm from "../studentForm/StudentForm";
 import StudentList from "../studentList/StudentList";
+import { useEffect } from "react";
 
 const Student = () => {
   const studentLocal = JSON.parse(localStorage.getItem("student")) || [];
   const [showFavorite, setshowFavorite] = useState(false);
   const [student, setStudent] = useState(studentLocal);
+  const [search, setSearch] = useState(" ");
+  const [filter, setFilter] = useState("All");
+  // const [filteredStudent, setFilteredStudent] = useState(student);
+  const [searchedStudent, setSearchedStudent] = useState(student);
+  const [studentToSend, setStudentToSend] = useState(student);
 
   // ([
   //   {
@@ -53,6 +59,34 @@ const Student = () => {
     }
   };
 
+  const handleSearchChange = (e) => {
+    setSearch(e.target.value);
+    searchStudent(e.target.value);
+  };
+
+  const handleFilterChange = (e) => {
+    setFilter(e.target.value);
+    const newStudent =
+      e.target.value === "All"
+        ? student
+        : student.filter((cn) => cn.category === e.target.value);
+    setStudentToSend(newStudent);
+  };
+
+  const searchStudent = (text) => {
+    const searchedStudentList = student.filter(
+      (st) =>
+        st.firstName.trim().toLowerCase().includes(text.toLowerCase()) ||
+        st.lastName.trim().toLowerCase().includes(text.toLowerCase()) ||
+        st.phone.trim().toLowerCase().includes(text.toLowerCase())
+    );
+    setSearchedStudent(searchedStudentList);
+  };
+
+  useEffect(() => {
+    searchStudent(search);
+  }, [search]);
+
   return (
     <div className="container py-3 d-flex align-items-start justify-content-between">
       <div className="w-50    ">
@@ -63,8 +97,16 @@ const Student = () => {
             name="search"
             type="text"
             placeholder="Search "
+            value={search}
+            onChange={handleSearchChange}
           />
-          <select name="filter" id="filter" className="form-select ">
+          <select
+            name="filter"
+            id="filter"
+            className="form-select "
+            value={filter}
+            onChange={handleFilterChange}
+          >
             <option value="All">All</option>
             <option value="React N32">React N32</option>
             <option value="React N1">React N1</option>
@@ -94,7 +136,9 @@ const Student = () => {
           </div>
           <StudentList
             student={
-              showFavorite ? student.filter((st) => st.favorite) : student
+              showFavorite
+                ? studentToSend.filter((st) => st.favorite)
+                : studentToSend
             }
             deleteStudent={deleteStudent}
           />
